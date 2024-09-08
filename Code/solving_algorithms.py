@@ -3,7 +3,7 @@ from itertools import combinations
 
 
 # Use matheuristic MH to solve the provided model. Solved model is returned.
-def CCVPR_matheuristic(model, Y, TLinit, TL, sizeK, sizeI, K, I):
+def CCVRP_matheuristic(model, Y, TLinit, TL, sizeK, sizeI, K, I):
     # Set TimeLimit parameter to TLinit and find a solution.
     model.setParam("TimeLimit", TLinit)
     model.optimize()
@@ -32,7 +32,7 @@ def CCVPR_matheuristic(model, Y, TLinit, TL, sizeK, sizeI, K, I):
     # The current solution is saved as current best solution.
     current_best = model.getAttr("ObjVal")
 
-    #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+    #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
     #plt.title("Initial MH solution")
 
     # Set TimeLimit to TL and iterate until we get through Nnoimp iterations without improvement
@@ -54,14 +54,14 @@ def CCVPR_matheuristic(model, Y, TLinit, TL, sizeK, sizeI, K, I):
                     model.addConstr(Y[i, k] == Y[i, k].x, 
                                     name = "CMH1_" + I.ID[i] + K.ID[k])
 
-        #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+        #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
         #plt.title("Old solution of MH iteration {}".format(niter))
 
         # Find new solution for the partial model. Revert to old solution if the one found is worst, keep it as new best otherwise.
         model.optimize()
         print("MH: (niter = {}) Best so far: {}\tCurrent: {}".format(niter + 1, current_best, model.getAttr("ObjVal")))
 
-        #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+        #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
         #plt.title("New solution of MH iteration {}".format(niter))
 
         if current_best < model.getAttr("ObjVal"):
@@ -80,7 +80,7 @@ def CCVPR_matheuristic(model, Y, TLinit, TL, sizeK, sizeI, K, I):
             noimp = noimp + 1
 
         print("noimp set to " + str(noimp))
-        #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+        #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
         #plt.title("Best solution of MH iteration {}".format(niter))
         #plt.show()
         
@@ -102,7 +102,7 @@ def CCVPR_matheuristic(model, Y, TLinit, TL, sizeK, sizeI, K, I):
 
 # Use matheuristic MH* to solve the provided model. If use_ILS_init is True, the solution in the model is used as initial solution. 
 # Solved model is returned.
-def CCVPR_matheuristic_star(model, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I, use_ILS_init = False):
+def CCVRP_matheuristic_star(model, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I, use_ILS_init = False):
     # If use_ILS_init == True the ILS provided initial solution is used.
     if use_ILS_init == False:
         print("MH*: No ILS init, searching a solution in TLinit " + str(TLinit) + "s")
@@ -142,7 +142,7 @@ def CCVPR_matheuristic_star(model, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I, us
     # The current solution is saved as current best solution.
     current_best = model.getAttr("ObjVal")
 
-    #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+    #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
     #plt.title("Initial MH solution")
 
     # Set TimeLimit to TL and iterate until we get through Nnoimp iterations without improvement
@@ -162,14 +162,14 @@ def CCVPR_matheuristic_star(model, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I, us
                     model.addConstr(Y[i, k] == Y[i, k].x, 
                                     name = "CMH1_" + I.ID[i] + K.ID[k])
 
-        #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+        #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
         #plt.title("Old solution of MH iteration {}".format(niter))
 
         # Find new solution for the partial model. Revert to old solution if the one found is worst, keep it as new best otherwise.
         model.optimize()
         print("MH*: (noimp = {}, niter = {}) Best so far: {}\tCurrent: {}".format(noimp + 1, niter + 1, current_best, model.getAttr("ObjVal")))
 
-        #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+        #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
         #plt.title("New solution of MH iteration {}".format(niter))
 
         if current_best < model.getAttr("ObjVal"):
@@ -189,7 +189,7 @@ def CCVPR_matheuristic_star(model, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I, us
             # Increase no improvement counter.
             noimp = noimp + 1
 
-        #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+        #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
         #plt.title("Best solution of MH iteration {}".format(niter))
         #plt.show()
         
@@ -209,17 +209,17 @@ def CCVPR_matheuristic_star(model, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I, us
     return model
 
 
-def CCVPR_iterated_local_search(model, Y, sizeK, sizeI, K, I, TLinit, TL, TLpert, Nnoimp, Niter, Npert):
+def CCVRP_iterated_local_search(model, Y, sizeK, sizeI, K, I, TLinit, TL, TLpert, Nnoimp, Niter, Npert):
     print("ILS: Starting ILS, search initial feasible solution with MH\n")
 
     # Obtain an initial solution using the matheuristic and save it as current best.
-    model = CCVPR_matheuristic_star(model, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I)
+    model = CCVRP_matheuristic_star(model, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I)
     current_best = model.getAttr("ObjVal")
     model.write("tempBestILS.sol")
 
     print("ILS: Initial solution for ILS found with MH")
 
-    #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+    #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
     #plt.title("Initial solution of ILS")
 
     iter = 1
@@ -230,7 +230,7 @@ def CCVPR_iterated_local_search(model, Y, sizeK, sizeI, K, I, TLinit, TL, TLpert
         nsol = 0
         nperm = 0
 
-        #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+        #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
         #plt.title("Solution of ILS before perm {}".format(iter))
 
         while nsol == 0:
@@ -282,15 +282,15 @@ def CCVPR_iterated_local_search(model, Y, sizeK, sizeI, K, I, TLinit, TL, TLpert
             model.setParam("TimeLimit", .01)
             model.optimize()
         
-        #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+        #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
         #plt.title("Best ILS solution at iteration {} for starting MH".format(iter))
 
         print("ILS: Search a better solution with MH in iteration {} of ILS".format(iter + 1))
         
         # Use current best solution as initial solution and run matheuristic.
-        model = CCVPR_matheuristic_star(model, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I, use_ILS_init = True)
+        model = CCVRP_matheuristic_star(model, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I, use_ILS_init = True)
 
-        #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+        #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
         #plt.title("MH solution at ILS iteration {}".format(iter))
 
         # Current best solution is kept.
@@ -310,7 +310,7 @@ def CCVPR_iterated_local_search(model, Y, sizeK, sizeI, K, I, TLinit, TL, TLpert
             model.setParam("TimeLimit", .01)
             model.optimize()
 
-        #CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+        #CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
         #plt.title("Selected solution at ILS iteration {}".format(iter))
         #plt.show()
 

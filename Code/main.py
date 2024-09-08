@@ -3,17 +3,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 
-from CCVPR_model import CCVPR_model
-from CCVPR_instances import import_problem_istance
-from CCVPR_instances import estimate_cost_per_unit
-from CCVPR_instances import estimate_time_per_unit
-from solving_algorithms import CCVPR_matheuristic
-from solving_algorithms import CCVPR_matheuristic_star
-from solving_algorithms import CCVPR_iterated_local_search
+from CCVRP_model import CCVRP_model
+from CCVRP_instances import import_problem_istance
+from CCVRP_instances import estimate_cost_per_unit
+from CCVRP_instances import estimate_time_per_unit
+from solving_algorithms import CCVRP_matheuristic
+from solving_algorithms import CCVRP_matheuristic_star
+from solving_algorithms import CCVRP_iterated_local_search
 
 
 # Return a plot of the routes for each period and each carrier for the provided solved model. Original carriers and depots are marked as well.
-def CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X):
+def CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X):
     color = ["red", "green", "blue", "orange", "slategray", "magenta", "gold", "forestgreen"]
     fig = plt.figure()
 
@@ -96,36 +96,36 @@ def solve_small_instances(solver, save_fig = False, vi_indexes = [1, 3, 4]):
         print("Qmax_k: {}".format(Qmax_k))
 
         # Obtain the model and variables.
-        N, sizeN, t, c, Y, X, T, L, Vmin, ccvprModel = CCVPR_model(sizeK, sizeI, sizeP, P, K, I, Tmax, Qmax, tu, cu, delta, vi_indexes = vi_indexes,
+        N, sizeN, t, c, Y, X, T, L, Vmin, ccvrpModel = CCVRP_model(sizeK, sizeI, sizeP, P, K, I, Tmax, Qmax, tu, cu, delta, vi_indexes = vi_indexes,
                                                                    Qmax_k = Qmax_k, selfConstr = True, TConstr = True, LConstr = True)
-        ccvprModel.setParam("LogToConsole", 0)
+        ccvrpModel.setParam("LogToConsole", 0)
 
         # Select solver.
         if solver == "MIP":
             print("Optimizing " + file[i] + " with MIP")
 
-            ccvprModel.setParam("TimeLimit", 10 * 60)
-            ccvprModel.optimize()
+            ccvrpModel.setParam("TimeLimit", 10 * 60)
+            ccvrpModel.optimize()
 
             # Save the result in the appropriate row of the dataframe.
-            df.loc[file[i]] = pd.Series({"Solution Value": round(ccvprModel.ObjVal, 2), 
-                                         "Gap (%)": round(ccvprModel.MIPGap * 100, 2), 
-                                         "Time (s)": round(ccvprModel.Runtime, 2)})
+            df.loc[file[i]] = pd.Series({"Solution Value": round(ccvrpModel.ObjVal, 2), 
+                                         "Gap (%)": round(ccvrpModel.MIPGap * 100, 2), 
+                                         "Time (s)": round(ccvrpModel.Runtime, 2)})
 
             # Write the solution in a .sol file.
             if vi_indexes == []:
-                ccvprModel.write("Results/Small Instances/MIP/" + file[i] + "_no_VI.sol")
+                ccvrpModel.write("Results/Small Instances/MIP/" + file[i] + "_no_VI.sol")
             else:
-                ccvprModel.write("Results/Small Instances/MIP/" + file[i] + ".sol")
+                ccvrpModel.write("Results/Small Instances/MIP/" + file[i] + ".sol")
 
             # Create a plot of the solution routing.
             if save_fig:
-                CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+                CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
                 plt.savefig("Results/Small Instances/MIP/" + file[i] + ".png")
 
-            print("\tSolution Value: {};\tGap (%): {}\tTime (s): {}".format(round(ccvprModel.ObjVal, 2), 
-                                                                        round(ccvprModel.MIPGap * 100, 2), 
-                                                                        round(ccvprModel.Runtime, 2)))
+            print("\tSolution Value: {};\tGap (%): {}\tTime (s): {}".format(round(ccvrpModel.ObjVal, 2), 
+                                                                        round(ccvrpModel.MIPGap * 100, 2), 
+                                                                        round(ccvrpModel.Runtime, 2)))
 
         elif solver == "MH":
             print("Optimizing " + file[i] + " with MH")
@@ -135,19 +135,19 @@ def solve_small_instances(solver, save_fig = False, vi_indexes = [1, 3, 4]):
             BKS = BKS["Solution Value"][i]
 
             t_in = time.time()
-            ccvprModel = CCVPR_matheuristic(ccvprModel, Y, TLinit, TL, sizeK, sizeI, K, I)
+            ccvrpModel = CCVRP_matheuristic(ccvrpModel, Y, TLinit, TL, sizeK, sizeI, K, I)
             t_fin = time.time()
 
             # Save the result in the appropriate row of the dataframe.
-            df.loc[file[i]] = pd.Series({"Solution Value": round(ccvprModel.ObjVal, 2),
-                                         "Gap (%)": round((ccvprModel.ObjVal - BKS) * 100 / BKS, 2), 
+            df.loc[file[i]] = pd.Series({"Solution Value": round(ccvrpModel.ObjVal, 2),
+                                         "Gap (%)": round((ccvrpModel.ObjVal - BKS) * 100 / BKS, 2), 
                                          "Time (s)": round(t_fin - t_in, 2)})
 
             # Write the solution in a .sol file.
-            ccvprModel.write("Results/Small Instances/MH/" + file[i] + ".sol")
+            ccvrpModel.write("Results/Small Instances/MH/" + file[i] + ".sol")
 
-            print("\tSolution Value: {};\tGap (%): {}\tTime (s): {}".format(round(ccvprModel.ObjVal, 2), 
-                                                                        round((ccvprModel.ObjVal - BKS) * 100 / BKS, 2), 
+            print("\tSolution Value: {};\tGap (%): {}\tTime (s): {}".format(round(ccvrpModel.ObjVal, 2), 
+                                                                        round((ccvrpModel.ObjVal - BKS) * 100 / BKS, 2), 
                                                                         round(t_fin - t_in, 2)))
 
         elif solver == "ILS":
@@ -162,19 +162,19 @@ def solve_small_instances(solver, save_fig = False, vi_indexes = [1, 3, 4]):
                 print("Optimizing " + file[i] + " with ILS: iteration " + str(n + 1) + "/5")
 
                 t_in = time.time()
-                ccvprModel = CCVPR_iterated_local_search(ccvprModel, Y, sizeK, sizeI, K, I, TLinit, TL, TLpert, Nnoimp, Niter, Npert)
+                ccvrpModel = CCVRP_iterated_local_search(ccvrpModel, Y, sizeK, sizeI, K, I, TLinit, TL, TLpert, Nnoimp, Niter, Npert)
                 t_fin = time.time()
 
                 # Write the solution in a .sol file.
-                ccvprModel.write("Results/Small Instances/ILS/" + file[i] + "_it_" + str(n + 1) + ".sol")
+                ccvrpModel.write("Results/Small Instances/ILS/" + file[i] + "_it_" + str(n + 1) + ".sol")
                 
-                result = np.append(result, ccvprModel.ObjVal)
+                result = np.append(result, ccvrpModel.ObjVal)
                 runtime = np.append(runtime, t_fin - t_in)
 
-                print("\tSolution Value: {};\tGap (%): {}\tTime (s): {}".format(round(ccvprModel.ObjVal, 2), 
-                                                                            round((ccvprModel.ObjVal - BKS) * 100 / BKS, 2), 
+                print("\tSolution Value: {};\tGap (%): {}\tTime (s): {}".format(round(ccvrpModel.ObjVal, 2), 
+                                                                            round((ccvrpModel.ObjVal - BKS) * 100 / BKS, 2), 
                                                                             round(t_fin - t_in, 2)))
-                ccvprModel.reset()
+                ccvrpModel.reset()
             
             # Save the result in the appropriate row of the dataframe.
             df.loc[file[i]] = pd.Series({"Solution Value": round(np.mean(result), 2),
@@ -217,10 +217,10 @@ def solve_large_instances(solver):
         print("Qmax_k: {}".format(Qmax_k))
 
         # Obtain the model and variables.
-        N, sizeN, t, c, Y, X, T, L, Vmin, ccvprModel = CCVPR_model(sizeK, sizeI, sizeP, P, K, I, Tmax, Qmax, tu, cu, delta, vi_indexes = [1, 3, 4],
+        N, sizeN, t, c, Y, X, T, L, Vmin, ccvrpModel = CCVRP_model(sizeK, sizeI, sizeP, P, K, I, Tmax, Qmax, tu, cu, delta, vi_indexes = [1, 3, 4],
                                                                    Qmax_k = Qmax_k, selfConstr = True, TConstr = True, LConstr = True)
         
-        ccvprModel.setParam("LogToConsole", 0)
+        ccvrpModel.setParam("LogToConsole", 0)
 
         # Select solver.
         if solver == "MH*":
@@ -230,18 +230,18 @@ def solve_large_instances(solver):
                 print("Optimizing " + file[i] + " with MH*: iteration " + str(n + 1))
 
                 t_in = time.time()
-                ccvprModel = CCVPR_matheuristic_star(ccvprModel, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I)
+                ccvrpModel = CCVRP_matheuristic_star(ccvrpModel, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I)
                 t_fin = time.time()
                 
                 # Write the solution in a .sol file.
-                ccvprModel.write("Results/Large Instances/MHstar/" + file[i] + "_it_" + str(n + 1) + ".sol")
+                ccvrpModel.write("Results/Large Instances/MHstar/" + file[i] + "_it_" + str(n + 1) + ".sol")
 
-                result = np.append(result, ccvprModel.ObjVal)
+                result = np.append(result, ccvrpModel.ObjVal)
                 runtime = np.append(runtime, t_fin - t_in)
 
-                print("\tSolution Value: {};\tTime (s): {}".format(round(ccvprModel.ObjVal, 2),
+                print("\tSolution Value: {};\tTime (s): {}".format(round(ccvrpModel.ObjVal, 2),
                                                                    round(t_fin - t_in, 2)))
-                ccvprModel.reset()
+                ccvrpModel.reset()
 
             # Save the result in the appropriate row of the dataframe.
             df.loc[file[i]] = pd.Series({"Solution Value": round(np.mean(result), 2),
@@ -254,18 +254,18 @@ def solve_large_instances(solver):
                 print("Optimizing " + file[i] + " with ILS: iteration " + str(n + 1))
 
                 t_in = time.time()
-                ccvprModel = CCVPR_iterated_local_search(ccvprModel, Y, sizeK, sizeI, K, I, TLinit, TL, TLpert, Nnoimp, Niter, Npert)
+                ccvrpModel = CCVRP_iterated_local_search(ccvrpModel, Y, sizeK, sizeI, K, I, TLinit, TL, TLpert, Nnoimp, Niter, Npert)
                 t_fin = time.time()
 
                 # Write the solution in a .sol file.
-                ccvprModel.write("Results/Large Instances/ILS/" + file[i] + "_it_" + str(n + 1) + ".sol")
+                ccvrpModel.write("Results/Large Instances/ILS/" + file[i] + "_it_" + str(n + 1) + ".sol")
                 
-                result = np.append(result, ccvprModel.ObjVal)
+                result = np.append(result, ccvrpModel.ObjVal)
                 runtime = np.append(runtime, t_fin - t_in)
 
-                print("\tSolution Value: {};\tTime (s): {}".format(round(ccvprModel.ObjVal, 2),
+                print("\tSolution Value: {};\tTime (s): {}".format(round(ccvrpModel.ObjVal, 2),
                                                                    round(t_fin - t_in, 2)))
-                ccvprModel.reset()
+                ccvrpModel.reset()
 
             # Save the result in the appropriate row of the dataframe.
             df.loc[file[i]] = pd.Series({"Solution Value": round(np.mean(result), 2),
@@ -303,7 +303,7 @@ cu = 0.1
 #estimate_cost_per_unit(K, I)
 
 # Obtain the instance model and its variables.
-N, sizeN, t, c, Y, X, T, L, Vmin, ccvprModel = CCVPR_model(sizeK, sizeI, sizeP, P, K, I, Tmax, Qmax, tu, cu, delta, vi_indexes = [1, 3, 4],
+N, sizeN, t, c, Y, X, T, L, Vmin, ccvrpModel = CCVRP_model(sizeK, sizeI, sizeP, P, K, I, Tmax, Qmax, tu, cu, delta, vi_indexes = [1, 3, 4],
                                                            Qmax_k = Qmax_k, selfConstr = True, TConstr = True, LConstr = True)
 
 # Define the running parameters of the MH, MH* and ILS solver.
@@ -314,34 +314,34 @@ Npert = 3
 Niter = 5
 Nnoimp = 5
 
-#ccvprModel.setParam("LogToConsole", 0);
+#ccvrpModel.setParam("LogToConsole", 0);
 
 # Solve using Gurobi MIP solver.
-ccvprModel.optimize()
-CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+ccvrpModel.optimize()
+CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
 plt.subplot(int(np.ceil(sizeP / 2)), int(np.floor(sizeP / 2)), 1)
 plt.title("MIP solution")
-ccvprModel.reset()
+ccvrpModel.reset()
 
 # Solve using MH.
-ccvprModel = CCVPR_matheuristic(ccvprModel, Y, TLinit, TL, sizeK, sizeI, K, I)
-CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+ccvrpModel = CCVRP_matheuristic(ccvrpModel, Y, TLinit, TL, sizeK, sizeI, K, I)
+CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
 plt.subplot(int(np.ceil(sizeP / 2)), int(np.floor(sizeP / 2)), 1)
 plt.title("MH solution")
-ccvprModel.reset()
+ccvrpModel.reset()
 
 # Solve using MH*.
-ccvprModel = CCVPR_matheuristic_star(ccvprModel, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I)
-CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+ccvrpModel = CCVRP_matheuristic_star(ccvrpModel, Y, TLinit, TL, Nnoimp, sizeK, sizeI, K, I)
+CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
 plt.subplot(int(np.ceil(sizeP / 2)), int(np.floor(sizeP / 2)), 1)
 plt.title("MH* solution")
-ccvprModel.reset()
+ccvrpModel.reset()
 
 # Solve using ILS.
-ccvprModel = CCVPR_iterated_local_search(ccvprModel, Y, sizeK, sizeI, K, I, TLinit, TL, TLpert, Nnoimp, Niter, Npert)
-CCVPR_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
+ccvrpModel = CCVRP_iterated_local_search(ccvrpModel, Y, sizeK, sizeI, K, I, TLinit, TL, TLpert, Nnoimp, Niter, Npert)
+CCVRP_plot_route(sizeK, sizeP, sizeN, P, I, N, X)
 plt.subplot(int(np.ceil(sizeP / 2)), int(np.floor(sizeP / 2)), 1)
 plt.title("MIP solution")
-ccvprModel.reset()
+ccvrpModel.reset()
 
 plt.show()
