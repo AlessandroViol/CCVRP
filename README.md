@@ -5,6 +5,7 @@
 This python script was developed as a project for an exam on Mathematical Optimisation. 
 It is part of a study conducted on [this paper](https://www.sciencedirect.com/science/article/pii/S0377221721000035) by Simona Mancini, Margaretha Gansterer, Richard F. Hartl published on the "European Journal of Operational Research".
 
+<br/>
 
 ## Overview
 The paper presents the various mathematical constraints and objective functions for modelling and solving a centrally organized Collaborative Consistent Vehicle Routing Problem (CCVRP). 
@@ -15,6 +16,7 @@ A client must also be served consistently according the time of the delivery and
 
 The paper also proposes three heuristic algorithms to solve this problem, along with the data about their performance on a dataset shared by the authors.
 
+<br/>
 
 ## About the Project
 Our work consisted in an in-depth study of this paper and the proposed model, which was then implemented using Python and Gurobi. 
@@ -25,15 +27,20 @@ The results of our tests on our updated model are available on the [project repo
 
 A brief study on the scalability of this solution is available on that same report.
 
+<br/>
 
 ## Features
 Using this software the user can input any centrally organized CCVR problem and solve it using either the Gurobi solver or MH, MH* and ILS algorithms.
 The solutions are then visualized through an intuitive plot.
 
+<br/>
+
 ## Authors
 
 - Alessandro Viol: [@AlessandrViol](https://www.github.com/AlessandroViol)
 - Federica Azzalini: [@F1397](https://github.com/F1397)
+
+<br/>
 
 ## Reference
 
